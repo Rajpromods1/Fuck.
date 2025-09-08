@@ -1,0 +1,224 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login & Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #ff9a9e, #fad0c4);
+            overflow: hidden;
+        }
+        .background {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: url('https://source.unsplash.com/1600x900/?nature,abstract') no-repeat center/cover;
+            filter: blur(8px);
+            z-index: -1;
+        }
+        .login-container {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 30px;
+            border-radius: 10px;
+            text-align: center;
+            width: 350px;
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        h2 {
+            margin-bottom: 15px;
+            color: white;
+            font-weight: 600;
+        }
+        input {
+            width: 100%;
+            padding: 12px;
+            margin: 10px 0;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            outline: none;
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .btn {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 10px;
+            background: #ff758c;
+            color: white;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+        .btn:hover {
+            background: #ff5252;
+        }
+        .dashboard {
+            display: none;
+            text-align: center;
+            width: 100%;
+            height: 100vh;
+            background: #1e1e1e;
+            color: white;
+            padding: 20px;
+            position: relative;
+        }
+        .user-name {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            color: rgba(255, 255, 255, 0.8);
+        }
+        h1 {
+            color: red;
+            margin-top: 20px;
+        }
+        .result-container {
+            margin-top: 50px;
+        }
+        .text-field {
+            margin: 20px auto;
+            padding: 10px;
+            font-size: 18px;
+            width: 300px;
+            border: 2px solid red;
+            border-radius: 5px;
+            text-align: center;
+            background-color: #333;
+            color: red;
+        }
+        .button-container {
+            margin-top: 20px;
+        }
+        .result-button {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: red;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .result-button:hover {
+            background-color: darkred;
+        }
+    </style>
+</head>
+<body>
+    <div class="background"></div>
+    
+    <!-- Login Page -->
+    <div class="login-container" id="loginBox">
+        <h2>Login</h2>
+        <input type="text" id="nameInput" placeholder="Enter Name">
+        <input type="password" id="password" placeholder="Enter Password">
+        <button class="btn" onclick="login()">Login</button>
+    </div>
+    
+    <!-- Dashboard -->
+    <div class="dashboard" id="dashboard">
+
+<h1>RAJ PRO MODS</h1>
+        <span class="user-name" id="displayName"></span>
+        
+        <!-- Result System -->
+        <div class="result-container">
+            <div id="Textview2" class="text-field">Period Number: </div>
+            <div id="Textview1" class="text-field">Result: </div>
+            <div class="button-container">
+                <button class="result-button" onclick="updateResult()">Get Result</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let wrongAttempts = 0;
+
+        function login() {
+            var username = document.getElementById("nameInput").value.trim();
+            var password = document.getElementById("password").value.trim();
+
+            if (username === "RAJ" && password === "MODS") {
+                document.getElementById("loginBox").style.display = "none";
+                document.getElementById("dashboard").style.display = "block";
+                document.getElementById("displayName").textContent = username;
+
+                wrongAttempts = 0;
+                speak("Welcome Raj Bhai");
+            } else {
+                wrongAttempts++;
+
+                if (wrongAttempts < 3) {
+                    speak("Madarchod, galat password hai!");
+                } else {
+                    speak("Lavde, fir se galat password mat dal!");
+                }
+            }
+        }
+
+        function speak(text) {
+            if ('speechSynthesis' in window) {
+                let utterance = new SpeechSynthesisUtterance(text);
+                utterance.lang = "hi-IN";
+                utterance.rate = 1;
+                utterance.pitch = 1;
+                utterance.volume = 1;
+
+                setTimeout(() => {
+                    window.speechSynthesis.speak(utterance);
+                }, 200);
+            } else {
+                alert("Your browser does not support speech synthesis.");
+            }
+        }
+
+        function updateResult() {
+            const calendar = new Date();
+            const hour = calendar.getHours();
+            const minute = calendar.getMinutes();
+            const totalMinutes = (hour * 60) + minute;
+
+            const currentDate = calendar.toISOString().slice(0, 10).replace(/-/g, '');
+            const offset = 330;
+            const periodCalculation = 10001 + totalMinutes - offset;
+            const periodNumber = currentDate + "1000" + periodCalculation;
+
+            document.getElementById('Textview2').textContent = "Period Number: " + periodNumber;
+
+            let digitSum = 0;
+            String(periodCalculation).split('').forEach(digit => {
+                digitSum += parseInt(digit, 10);
+            });
+
+            const resultNumber = (digitSum * 7) % 10;
+            const result = (resultNumber >= 1 && resultNumber <= 4) ? "SMALL" : "BIG";
+
+            document.getElementById('Textview1').textContent = "Result: " + result;
+        }
+
+        setInterval(updateResult, 60000);
+        updateResult();
+    </script>
+</body>
+</html>
